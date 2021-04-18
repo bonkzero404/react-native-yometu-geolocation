@@ -1,6 +1,6 @@
 # What is react-native-yometu-geolocation
 
-react-native-yometu-geolocation is a library that is used to build applications such as fitness, cycling, and other sports that require location updates and timers.
+react-native-yometu-geolocation is a library that used to build applications such as fitness, cycling, and other sports that require location updates and timers.
 
 ## Installation
 
