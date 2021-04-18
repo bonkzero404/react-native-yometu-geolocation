@@ -3,6 +3,8 @@ import { NativeEventEmitter, NativeModules } from 'react-native';
 
 let subscriptions: any[] = [];
 let timerInterval: any = null;
+let ymPaused: boolean = false;
+let timerCountUp = '00:00:00';
 
 export type Location = {
   latitude?: number;
@@ -44,6 +46,8 @@ type YometuGeolocationType = {
     cbTimer?: CallbackTimer,
     cbError?: any
   ): void;
+  pauseWatchLocation(): void;
+  resumeWatchLocation(): void;
   getLocation(
     options: OptionsGetGeolocation,
     cbSuccessLocation?: CallbackLocation,
@@ -97,8 +101,9 @@ const YometuGeolocationService = {
     cbTimer: CallbackTimer,
     cbError: any = null
   ) => {
-    YometuGeolocation.stopWatchLocation();
-    YometuGeolocation.startWatchLocation(options);
+    // YometuGeolocation.stopWatchLocation();
+    // YometuGeolocation.startObserving();
+    YometuGeolocation.startObserving(options);
 
     if (options.withTimer) {
       YometuGeolocationService.startTimer(cbTimer);
@@ -107,11 +112,23 @@ const YometuGeolocationService = {
     const watchID = subscriptions.length;
 
     subscriptions.push([
-      YometuEventEmitter.addListener('onReceiveYMData', cbSuccessLocation),
+      YometuEventEmitter.addListener('onReceiveYMData', (cb) => {
+        if (!ymPaused) {
+          cbSuccessLocation(cb);
+        }
+      }),
       cbError ? YometuEventEmitter.addListener('onErrorYMData', cbError) : null,
     ]);
 
     return watchID;
+  },
+
+  pauseWatchLocation: () => {
+    ymPaused = true;
+  },
+
+  resumeWatchLocation: () => {
+    ymPaused = false;
   },
 
   getLocation: (
@@ -127,7 +144,7 @@ const YometuGeolocationService = {
 
   stopWatchLocation: (watchID: any) => {
     YometuGeolocationService.stopTimer();
-    YometuGeolocation.stopWatchLocation();
+    YometuGeolocation.stopObserving();
 
     const sub = subscriptions[watchID];
 
@@ -203,15 +220,19 @@ const YometuGeolocationService = {
 
     let i = 0;
     timerInterval = setInterval(() => {
-      i++;
-      const timestamp = new Date(countFrom.getTime() + i * 1000);
-      const mytime = YometuGeolocationService.timeFormat(new Date(timestamp));
-
-      cbTimer(mytime);
+      if (!ymPaused) {
+        i++;
+        const timestamp = new Date(countFrom.getTime() + i * 1000);
+        const mytime = YometuGeolocationService.timeFormat(new Date(timestamp));
+        timerCountUp = mytime;
+        cbTimer(timerCountUp);
+      }
     }, 1000);
   },
 
   stopTimer: () => {
+    timerCountUp = '00:00:00';
+    ymPaused = false;
     clearInterval(timerInterval);
   },
 };

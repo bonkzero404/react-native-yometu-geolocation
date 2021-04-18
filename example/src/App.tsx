@@ -11,12 +11,23 @@ export default function App() {
     setSingleLocationData,
   ] = React.useState<Location>();
   const [locationData, setLocationData] = React.useState<Location>();
+  const [paused, setPaused] = React.useState(false);
 
   let watchId: any = null;
 
   React.useEffect(() => {
     YometuGeolocation.requestAuthorization();
   }, []);
+
+  const isPaused = () => {
+    if (!paused) {
+      setPaused(true);
+      YometuGeolocation.pauseWatchLocation();
+    } else {
+      setPaused(false);
+      YometuGeolocation.resumeWatchLocation();
+    }
+  };
 
   const startWatchLocation = async (): Promise<void> => {
     const locationAuthorization = await YometuGeolocation.getPermissionStatus();
@@ -26,7 +37,7 @@ export default function App() {
         {
           accuracy: 'highAccuracy',
           allowBackground: true,
-          distanceFilter: 1,
+          distanceFilter: 0,
           withTimer: true,
         },
         (loc) => {
@@ -56,7 +67,7 @@ export default function App() {
         {
           accuracy: 'highAccuracy',
           cacheAge: 10000,
-          distanceFilter: 1,
+          distanceFilter: 0,
           timeout: 15000,
         },
         (loc) => {
@@ -75,6 +86,7 @@ export default function App() {
 
   const stopWatchLocation = (): void => {
     setObserving(false);
+    setPaused(false);
     YometuGeolocation.stopWatchLocation(watchId);
   };
 
@@ -84,20 +96,40 @@ export default function App() {
       {!observing ? (
         <TouchableOpacity
           onPress={startWatchLocation}
-          style={styles.appButtonContainer}
+          style={[styles.appButtonContainer, styles.appButtonColorBlezie]}
         >
           <Text style={styles.appButtonText}>Watch Position</Text>
         </TouchableOpacity>
       ) : (
-        <TouchableOpacity
-          onPress={stopWatchLocation}
-          style={styles.appButtonContainer}
-        >
-          <Text style={styles.appButtonText}>Stop Watching Position</Text>
-        </TouchableOpacity>
+        <>
+          {paused ? (
+            <TouchableOpacity
+              onPress={isPaused}
+              style={[styles.appButtonContainer, styles.appButtonColorOrange]}
+            >
+              <Text style={styles.appButtonText}>Resume Watching Position</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={isPaused}
+              style={[styles.appButtonContainer, styles.appButtonColorPumpkins]}
+            >
+              <Text style={styles.appButtonText}>Pause Watching Position</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            onPress={stopWatchLocation}
+            style={[styles.appButtonContainer, styles.appButtonColorAlizarin]}
+          >
+            <Text style={styles.appButtonText}>Stop Watching Position</Text>
+          </TouchableOpacity>
+        </>
       )}
 
-      <TouchableOpacity onPress={getLocation} style={styles.appButtonContainer}>
+      <TouchableOpacity
+        onPress={getLocation}
+        style={[styles.appButtonContainer, styles.appButtonColorWisteria]}
+      >
         <Text style={styles.appButtonText}>Get Current Location</Text>
       </TouchableOpacity>
 
@@ -127,11 +159,25 @@ const styles = StyleSheet.create({
   },
   appButtonContainer: {
     elevation: 8,
-    backgroundColor: '#009688',
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
     marginBottom: 10,
+  },
+  appButtonColorBlezie: {
+    backgroundColor: '#2980b9',
+  },
+  appButtonColorAlizarin: {
+    backgroundColor: '#e74c3c',
+  },
+  appButtonColorWisteria: {
+    backgroundColor: '#8e44ad',
+  },
+  appButtonColorPumpkins: {
+    backgroundColor: '#d35400',
+  },
+  appButtonColorOrange: {
+    backgroundColor: '#f39c12',
   },
   appButtonText: {
     fontSize: 18,
