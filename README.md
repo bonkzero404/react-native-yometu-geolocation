@@ -19,12 +19,9 @@ yarn add react-native-yometu-geolocation
 <details>
 <summary><strong>iOS Installation Instructions</strong></summary>
 
-### 1. Install with Cocoapods
-You can also link the library using Cocoapods by adding this line to your `Podfile`:
+### 1. Linking
+YFor RN 0.60 or higher, no manual linking is needed. After installing the package, just run pod install from inside ios directory. It'll automatically pickup the package and install it.
 
-```ruby
-pod 'react-native-yometu-geolocation', :path => '../node_modules/react-native-yometu-geolocation/react-native-yometu-geolocation.podspec'
-```
 ### 2. Info.plist usage descriptions
 Finally, you then need to make sure you have the correct usage discriptions inside your `Info.plist` file. The message will show in the Alert box when your app requests permissions and lets the user know why you are asking for that permissions. They are also part of the App Store review process.
 
@@ -157,24 +154,50 @@ if (locationAuthorization.status) {
 
 ## Troubleshooting
 <details>
-<summary><strong>Error: <span style="color:red;">Undefined symbol: __swift_FORCE_LOAD_$_swiftWebkit</span></strong></summary>
+<summary><strong>Error: Undefined symbol: __swift_FORCE_LOAD_$_swiftWebkit</strong></summary>
 if you have problems when building the project as below:
 
 ![Screenshot](internals/err-swift.png)
 
-Create empty swift file in your project with XCode
+You must enable swift support in your project. Since the iOS implementation is written in swift, you need to add swift support in your project. It can be done just by adding an empty swift file and a bridging header in your project folder. You have to do it from xcode, otherwise swift compiler flag won't be updated.
+
+### 1. Create empty swift file in your project with XCode
 
 ![Screenshot](internals/new-file.png)
 
-Click next button, then save your empty file
+### 2. Click next button, then save your empty file
 
 ![Screenshot](internals/save-file.png)
 
-XCode will ask you "Create Bridging Header".
+### 3. XCode will ask you "Create Bridging Header".
 
 ![Screenshot](internals/bridging.png)
 
 You can choose "Create Bridging Header", after that rebuild your code, and everything works normally.
+
+</details>
+
+<details>
+<summary><strong>Build Error: 'event2/event-config.h' file not found</strong></summary>
+
+This issue is caused by an update to the "Flipper-Folly" pod-spec. If you'd like to keep Flipper enabled, you can override the version in your Podfile:
+
+Open your Podfile in your iOS project and change these lines of codes
+
+```ruby
+# use_flipper! --> Change this to
+use_flipper!({ 'Flipper-Folly' => '2.3.0' }) # Update this part
+post_install do |installer|
+  flipper_post_install(installer)
+end
+```
+
+You will need to update your pods by running
+```sh
+pod update
+```
+
+
 </details>
 
 ## Contributing
