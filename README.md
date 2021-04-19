@@ -127,7 +127,7 @@ if (locationAuthorization.status) {
       accuracy: 'highAccuracy',
       cacheAge: 10000,
       distanceFilter: 1,
-      timeout: 15000,
+      timeout: 20000,
     },
     (loc) => {
       console.log('Current Location ===>', loc);
