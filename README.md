@@ -16,7 +16,7 @@ npm install react-native-yometu-geolocation
 yarn add react-native-yometu-geolocation
 ```
 
-<details>
+<details open>
 <summary><strong>iOS Installation Instructions</strong></summary>
 
 ### 1. Linking
