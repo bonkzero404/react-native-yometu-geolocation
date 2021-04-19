@@ -163,12 +163,15 @@ if you have problems when building the project as below:
 ![Screenshot](internals/err-swift.png)
 
 Create empty swift file in your project with XCode
+
 ![Screenshot](internals/new-file.png)
 
 Click next button, then save your empty file
+
 ![Screenshot](internals/save-file.png)
 
 XCode will ask you "Create Bridging Header".
+
 ![Screenshot](internals/bridging.png)
 
 You can choose "Create Bridging Header", after that rebuild your code, and everything works normally.
